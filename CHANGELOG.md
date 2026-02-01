@@ -9,10 +9,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-02-01
+- Include default drum mapping CSV file with the package.
 
-## [1.0.1] - 2026-01-31
-
-### Changed
+## [1.0.1] - 2026-02-01
 - Default drum mapping file path is now resolved using main script path. This
   fixes a problem when trying to run the script from any other directory than
   the script path.

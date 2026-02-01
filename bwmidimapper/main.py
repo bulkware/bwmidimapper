@@ -18,8 +18,10 @@ python bwmidimapper.py "infile.mid" "outfile.mid" --force-percussion \
 import argparse  # Parser for command-line options, arguments and subcommands
 import csv  # CSV File Reading and Writing
 import logging  # Logging facility for Python
+import os  # Miscellaneous operating system interfaces
 import re  # Regular expression operations
 import sys  # System-specific parameters and functions
+from importlib.resources import files  # The implementation of import
 from typing import Dict, Optional, Tuple  # Support for type hints
 from pathlib import Path  # Object-oriented filesystem paths
 
@@ -264,10 +266,9 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
 
 def main(argv=None):
 
-    # Declare constants
-    SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))  # Scripts path
-    WORKING_PATH = os.getcwd()  # Working path
-    MAPPING_FILE = os.path.join(SCRIPTS_PATH, "ad2gm.csv")  # Mapping file path
+    # Declare constants for drum mapping file and it's path
+    MAPPING_FILE = "ad2gm.csv"
+    MAPPING_PATH = files("bwmidimapper").joinpath("data").joinpath("ad2gm.csv")
 
     # Initialize ArgumentParser
     parser = argparse.ArgumentParser(
@@ -293,7 +294,7 @@ def main(argv=None):
         help="Time signature for output MIDI file, eg. 4/4."
     )
     parser.add_argument(
-        "--drum-map", default=MAPPING_FILE, type=str,
+        "--drum-map", default=MAPPING_PATH, type=str,
         help=f"Drum mapping file. Default is: '{MAPPING_FILE}'."
     )
     parser.add_argument(

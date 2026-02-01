@@ -12,6 +12,7 @@ pytest -q test_bwmidimapper.py
 # Python imports
 import io  # Core tools for working with streams
 import os  # Miscellaneous operating system interfaces
+
 import tempfile  # Generate temporary files and directories
 from pathlib import Path  # Object-oriented filesystem paths
 
@@ -20,7 +21,7 @@ import mido  # MIDI Objects for Python
 import pytest  # Simple powerful testing with Python
 
 # bwMIDIMapper imports
-from bwmidimapper import read_mapping, convert_midi
+from bwmidimapper.main import read_mapping, convert_midi
 
 
 def write_sample_csv(path: Path):

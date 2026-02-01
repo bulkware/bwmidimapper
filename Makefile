@@ -1,5 +1,7 @@
-scripts := $(wildcard bw_*.py)
-tests := $(wildcard test_bw*.py)
+scripts := $(wildcard bwmidimapper/*.py)
+tests := $(wildcard test/test_*.py)
+
+.PHONY: all checkstyle test dist clean 
 
 all: clean checkstyle test dist
 
@@ -7,7 +9,7 @@ checkstyle: $(scripts) $(tests) setup.py
 	find . -name "*.py" -exec pycodestyle --max-line-length=80 \{\} \; | tee checkstyle
 
 test:
-	pytest -q $(tests)
+	PYTHONPATH=$(CURDIR) python -m pytest -q
 
 dist: $(scripts) $(tests) setup.py
 	python3 setup.py sdist --format=gztar
