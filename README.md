@@ -7,9 +7,9 @@ A tool to convert MIDI files between different drum mappings.
 
 <p>I made this package because I wasn't able to import my drum MIDI files to
 TuxGuitar without some processing. I wanted to make notation and tablatures for
-our songs so my fellow bandmates could learn our songs that way. I also wanted
-to include our drum tracks in these notation and tablature files since we had
-those in MIDI format anyway, so I thought I could just export those from my DAW
+our songs so my fellow bandmates could learn our songs that way. I wanted to
+include our drum tracks in these notation and tablature files since we had
+those in MIDI format anyway. So I thought I could just export those from my DAW
 and import them to TuxGuitar. The first problem was that the note numbers I had
 used in my DAW were not the same as defined in General MIDI standard, so I had
 to make some kind of conversion for those. I asked around about this kind of

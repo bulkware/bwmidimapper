@@ -22,6 +22,6 @@ setup(
     license="GPLv3",
     name="bwmidimapper",
     py_modules=["bwmidimapper"],
-    version="1.0.0",
+    version="1.0.1",
     url="https://github.com/bulkware/bwmidimapper"
 )

@@ -265,7 +265,9 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
 def main(argv=None):
 
     # Declare constants
-    MAPPING_FILE = "ad2gm.csv"
+    SCRIPTS_PATH = os.path.dirname(os.path.realpath(__file__))  # Scripts path
+    WORKING_PATH = os.getcwd()  # Working path
+    MAPPING_FILE = os.path.join(SCRIPTS_PATH, "ad2gm.csv")  # Mapping file path
 
     # Initialize ArgumentParser
     parser = argparse.ArgumentParser(
