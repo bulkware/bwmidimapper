@@ -161,6 +161,7 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
     """
 
     # Declare variables
+    active_notes = {}  # Active notes dictionary to identify duplicate notes
     percussion_channel = 9  # MIDI channel 10 = percussions, 0-based index
 
     # Read input MIDI file
@@ -206,13 +207,54 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
         # Process track's MIDI messages
         for msg in track:
 
-            # Process note numbers for note_on/note_off
-            if msg.type in ("note_on", "note_off"):
+            # Reset loop variables
+            active_note = None  # Active note key
+            mapped = None  # Mapped MIDI note number
+            new_msg = None  # New MIDI message
+            original = None  # (Possible) original MIDI note number
 
-                # Reset loop variables
-                mapped = None  # Mapped MIDI note number
-                new_msg = None  # New MIDI message
-                original = None  # (Possible) original MIDI note number
+            # Process note messages
+            if msg.type in ("note_on", "note_off"):
+                logging.info("Note %s", msg)
+
+                #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                # Overlapping notes
+                #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                # Create a key for active note
+                active_note = (msg.channel, msg.note)
+
+                # Note begins on note_on message with some velocity
+                if msg.type == "note_on" and msg.velocity > 0:
+
+                    # Check for overlapping notes
+                    if active_note in active_notes:
+                        logging.info(
+                            "Overlapping note, channel='%s', note='%s'",
+                            msg.channel, msg.note
+                        )
+                        continue
+
+                    # Add note to active_notes
+                    active_notes[active_note] = msg
+
+                # Remove active note on "note_off" message
+                elif msg.type == "note_off":
+                    if active_note in active_notes:
+                        logging.debug(
+                            "Active note removed, channel='%s', note='%s'",
+                            msg.channel, msg.note
+                        )
+                        del active_notes[active_note]
+
+                # Remove active note on "note_on" message when velocity is 0
+                # Note! In MIDI standard, this is a common way to stop notes.
+                elif msg.type == "note_on" and msg.velocity == 0:
+                    del active_notes[active_note]
+
+                #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                # Converting notes
+                #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
                 # Copy message (preserves time)
                 new_msg = msg.copy()
