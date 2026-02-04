@@ -138,7 +138,7 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
                  ts: Optional[Tuple[int, int]] = None,
                  force_percussion: bool = False,
                  preserve_meta: bool = False,
-                 remove_overlapping: bool = False) -> None:
+                 remove_duplicates: bool = False) -> None:
 
     """
     A tool to convert MIDI files between different drum mappings.
@@ -157,8 +157,8 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
     :type force_percussion: bool
     :param preserve_meta: If True, keep original tempo/time_signature metas.
     :type preserve_meta: bool
-    :param remove_overlapping: Remove overlapping notes
-    :type remove_overlapping: bool
+    :param remove_duplicates: Remove duplicate notes.
+    :type remove_duplicates: bool
 
     :return: None
     """
@@ -220,8 +220,8 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
             if msg.type in ("note_on", "note_off"):
                 logging.info("Note %s", msg)
 
-                # Overlapping notes
-                if remove_overlapping:
+                # Duplicate notes
+                if remove_duplicates:
 
                     # Create a key for active note
                     active_note = (msg.channel, msg.note)
@@ -229,10 +229,10 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
                     # Note begins on note_on message with some velocity
                     if msg.type == "note_on" and msg.velocity > 0:
 
-                        # Check for overlapping notes
+                        # Check for duplicate notes
                         if active_note in active_notes:
                             logging.info(
-                                "Overlapping note, channel='%s', note='%s'",
+                                "Duplicate note, channel='%s', note='%s'",
                                 msg.channel, msg.note
                             )
 
@@ -256,11 +256,7 @@ def convert_midi(drum_map: Dict[int, int], infile: str, outfile: str,
                     elif msg.type == "note_on" and msg.velocity == 0:
                         del active_notes[active_note]
 
-                #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                # Converting notes
-                #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-                # Copy message (preserves time)
+                # Converting notes, copy message (preserves time)
                 new_msg = msg.copy()
 
                 # Retrieve (possible) mapped MIDI note number
@@ -350,11 +346,11 @@ def main(argv=None):
     parser.add_argument(
         "--preserve-meta", action="store_true",
         help="Preserve tempo/time signature meta events from source file "
-             "(may create duplicates)."
+             "(may create duplicates meta events)."
     )
     parser.add_argument(
-        "--remove-overlapping", action="store_true",
-        help="Remove overlapping notes."
+        "--remove-duplicates", action="store_true",
+        help="Remove duplicate notes."
     )
     parser.add_argument(
         "--log-level", default="INFO",
@@ -401,7 +397,8 @@ def main(argv=None):
             args.tempo,
             args.time_signature,
             force_percussion=args.force_percussion,
-            preserve_meta=args.preserve_meta
+            preserve_meta=args.preserve_meta,
+            remove_duplicates=args.remove_duplicates
         )
     except Exception as exc:
         logging.exception("Conversion failed: %s", exc)
