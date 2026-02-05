@@ -24,6 +24,6 @@ setup(
     ],
     license="GPLv3",
     name="bwmidimapper",
-    version="1.0.1",
+    version="1.1.0",
     url="https://github.com/bulkware/bwmidimapper"
 )
