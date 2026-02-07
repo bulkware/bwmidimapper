@@ -1,4 +1,5 @@
 mido
 pycodestyle
+pylint
 pytest
 setuptools

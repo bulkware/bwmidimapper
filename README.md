@@ -97,7 +97,7 @@ Open your terminal application and run the following commands.
 `pip install --upgrade pip`
 
 ### Installing dependencies
-`pip install mido pycodestyle pytest setuptools`
+`pip install mido pycodestyle pylint pytest setuptools`
 
 ### Creating and entering a directory for the package
 ```

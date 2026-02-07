@@ -10,9 +10,9 @@ pytest -q test_bwmidimapper.py
 """
 
 # Python imports
+import argparse  # Parser for command-line options, arguments and subcommands
 import io  # Core tools for working with streams
 import os  # Miscellaneous operating system interfaces
-
 import tempfile  # Generate temporary files and directories
 from pathlib import Path  # Object-oriented filesystem paths
 
@@ -21,13 +21,14 @@ import mido  # MIDI Objects for Python
 import pytest  # Simple powerful testing with Python
 
 # bwMIDIMapper imports
-from bwmidimapper.main import read_mapping, convert_midi
+from bwmidimapper.appconfig import AppConfig
+from bwmidimapper.midihandler import MIDIHandler
 
 
 def write_sample_csv(path: Path):
     """Write a simple MIDI drum mapping CSV file."""
 
-    with open(path, "w", newline="", encoding="utf-8") as fh:
+    with open(path, "w", newline="", encoding="UTF-8") as fh:
         fh.write('"INP","OUT","AD2","GM"\n')
         fh.write('"---","---","---","--"\n')
         fh.write('"036","036","Kick","Electric Bass Drum"\n')
@@ -38,12 +39,15 @@ def write_sample_csv(path: Path):
 def test_read_mapping_accepts_valid_csv(tmp_path):
     """Test reading simple MIDI drum mapping CSV file."""
 
+    # Initialize AppConfig instance
+    appconfig = AppConfig()
+
     # Create a new MIDI drum mapping file
     csv_path = os.path.join(tmp_path, "mapping.csv")
     write_sample_csv(csv_path)
 
     # Read drum mapping file
-    mapping = read_mapping(str(csv_path))
+    mapping = appconfig.read_mapping(str(csv_path))
 
     # Check if drum mappings are valid
     assert isinstance(mapping, dict)
@@ -63,28 +67,16 @@ def create_simple_midi(path: Path):
     outfile_midi.tracks.append(track)
 
     # Set tempo meta message
-    track.append(
-        mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(120), time=0)
-    )
+    track.append(mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(120), time=0))
 
     # Set time signature meta message
-    track.append(
-        mido.MetaMessage("time_signature", numerator=4, denominator=4, time=0)
-    )
+    track.append(mido.MetaMessage("time_signature", numerator=4, denominator=4, time=0))
 
     # Set some note messages
-    track.append(
-        mido.Message("note_on", note=36, velocity=64, time=0, channel=9)
-    )
-    track.append(
-        mido.Message("note_off", note=36, velocity=64, time=240, channel=9)
-    )
-    track.append(
-        mido.Message("note_on", note=38, velocity=64, time=0, channel=0)
-    )
-    track.append(
-        mido.Message("note_off", note=38, velocity=64, time=240, channel=0)
-    )
+    track.append(mido.Message("note_on", note=36, velocity=64, time=0, channel=9))
+    track.append(mido.Message("note_off", note=36, velocity=64, time=240, channel=9))
+    track.append(mido.Message("note_on", note=38, velocity=64, time=0, channel=0))
+    track.append(mido.Message("note_off", note=38, velocity=64, time=240, channel=0))
 
     # Save output MIDI file
     outfile_midi.save(path)
@@ -105,6 +97,9 @@ def test_convert_midi_basic_mapping(tmp_path):
     outfile_path = Path(outfile)  # Output MIDI file Path object
     messages: list = []  # MIDI messages
 
+    # Initialize AppConfig
+    appconfig = AppConfig()
+
     # Generate a sample drum mapping CSV file
     write_sample_csv(csv_path)
 
@@ -112,18 +107,22 @@ def test_convert_midi_basic_mapping(tmp_path):
     create_simple_midi(infile)
 
     # Read mapping from CSV file
-    drum_mapping = read_mapping(csv_path)
+    drum_mapping = appconfig.read_mapping(csv_path)
 
-    # Convert MIDI file with default flags
-    convert_midi(
-        drum_map=drum_mapping,
-        infile=infile,
-        outfile=outfile,
-        tempo=None,
-        ts=None,
+    # Initialize MIDIHandler
+    args = argparse.Namespace(
+        infile=infile_path,
+        outfile=outfile_path,
         force_percussion=False,
         preserve_meta=True,
+        remove_duplicates=False,
+        tempo=None,
+        time_signature=None
     )
+    midihandler = MIDIHandler(args, drum_mapping)
+
+    # Convert MIDI file with default flags
+    midihandler = midihandler.process_file(infile=infile, outfile=outfile)
 
     # Verify output file exists and contains expected messages
     assert outfile_path.exists()
@@ -169,22 +168,32 @@ def test_convert_midi_force_percussion(tmp_path):
     mapped_notes = [36, 40]  # Expected mapped note values
     messages: list = []  # MIDI messages
 
+    # Initialize AppConfig
+    appconfig = AppConfig()
+
     # Generate a sample drum mapping CSV file
     write_sample_csv(csv_path)
+
+    # Read mapping from CSV file
+    drum_mapping = appconfig.read_mapping(csv_path)
 
     # Generate a sample MIDI file
     create_simple_midi(infile)
 
-    # Convert MIDI file with "force_percussion" and "preserve_meta" enabled
-    convert_midi(
-        drum_map=read_mapping(csv_path),
-        infile=infile,
-        outfile=outfile,
-        tempo=None,
-        ts=None,
+    # Initialize MIDIHandler
+    args = argparse.Namespace(
+        infile=infile_path,
+        outfile=outfile_path,
         force_percussion=True,
         preserve_meta=True,
+        remove_duplicates=False,
+        tempo=None,
+        time_signature=None
     )
+    midihandler = MIDIHandler(args, drum_mapping)
+
+    # Convert MIDI file with "force_percussion" and "preserve_meta" enabled
+    midihandler.process_file(infile=infile, outfile=outfile)
 
     # Create a new output MIDI file
     outfile_midi = mido.MidiFile(outfile)

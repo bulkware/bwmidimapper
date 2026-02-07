@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
+"""
+bwMIDIMapper
+A tool to convert MIDI files between different drum mappings.
+"""
+
 # Python imports
-import os
 from setuptools import find_packages, setup
 
 setup(
@@ -19,11 +23,12 @@ setup(
     install_requires=[
         "mido",
         "pycodestyle",
+        "pylint",
         "pytest",
         "setuptools"
     ],
     license="GPLv3",
     name="bwmidimapper",
-    version="1.1.0",
+    version="1.2.0",
     url="https://github.com/bulkware/bwmidimapper"
 )
