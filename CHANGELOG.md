@@ -8,7 +8,14 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [1.2.0] - 2026-02-07
+## [1.3.0] - 2026-02-15
+- An option to discard notes that are not defined in the drum map.
+- Changed "force percussion" option to affect notes that were not defined in the drum map.
+- Fixed a problem with circular imports.
+- Log notes as they are discarded.
+- Log notes as they are forced into percussion channel.
+
+## [1.2.0] - 2026-02-15
 - Changed maximum line length to 100 (based on PEP 8).
 - Refactored to use AppConfig and MIDIHandler classes.
 
