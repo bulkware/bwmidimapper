@@ -49,16 +49,18 @@ parameters are described in detail below.
 
 ## Parameters
 
-| Parameter            | Description                                                                                    |
-| -------------------- | ---------------------------------------------------------------------------------------------- |
-| `infile`             | Input MIDI file with source drum mapping.                                                      |
-| `outfile`            | Output MIDI file with target drum mapping.                                                     |
-| `--tempo`            | (Optional) Tempo for output MIDI file, e.g. 140.                                               |
-| `--time-signature`   | (Optional) Time signature for output MIDI file, eg. 7/4.                                       |
-| `--drum-map`         | (Optional) Drum mapping file. Default is: 'ad2gm.csv'.                                         |
-| `--force-percussion` | (Optional) Force mapped notes onto General MIDI percussion channel 10.                         |
-| `--preserve-meta`    | (Optional) Preserve tempo/time signature meta events from source file (may create duplicates). |
-| `--log-level`        | (Optional) Logging verbosity level.                                                            |
+| Parameter             | Description                                                                                    |
+| ----------------------| ---------------------------------------------------------------------------------------------- |
+| `infile`              | Input MIDI file with source drum mapping.                                                      |
+| `outfile`             | Output MIDI file with target drum mapping.                                                     |
+| `--discard-unmapped`  | (Optional) Discard notes that are not defined in the drum map.                                 |
+| `--drum-map`          | (Optional) Drum mapping file. Default is: 'ad2gm.csv'.                                         |
+| `--force-percussion`  | (Optional) Force mapped notes onto General MIDI percussion channel 10.                         |
+| `--log-level`         | (Optional) Logging verbosity level.                                                            |
+| `--remove-duplicates` | (Optional) Remove duplicate notes.                                                             |
+| `--preserve-meta`     | (Optional) Preserve tempo/time signature meta events from source file (may create duplicates). |
+| `--tempo`             | (Optional) Tempo for output MIDI file, e.g. 140.                                               |
+| `--time-signature`    | (Optional) Time signature for output MIDI file, eg. 7/4.                                       |
 
 
 ## Drum mapping CSV files
@@ -113,4 +115,4 @@ cd scripts
 `cd bwmidiremapper`
 
 ### Running the package's main script
-`python3 bwmidiremapper.py`
+`python -m bwmidimapper.main --help`
