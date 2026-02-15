@@ -70,6 +70,10 @@ class MIDIHandler:  # pylint: disable=R0903
             new_msg.note = mapped
             # Optionally, set percussion channel
             if self.args.force_percussion or msg.channel == self.percussion_channel:
+                logging.info(
+                    "Percussion channel %s is forced for note %s",
+                    self.percussion_channel + 1, original
+                )
                 new_msg.channel = self.percussion_channel
         else:
             logging.debug("Note %s not defined in DrumMap; keeping original.", original)
