@@ -66,17 +66,25 @@ class MIDIHandler:  # pylint: disable=R0903
         else:
             mapped = None
 
+        # Note is found in the drum map
         if mapped is not None:
             new_msg.note = mapped
-            # Optionally, set percussion channel
-            if self.args.force_percussion or msg.channel == self.percussion_channel:
-                logging.info(
-                    "Percussion channel %s is forced for note %s",
-                    self.percussion_channel + 1, original
-                )
-                new_msg.channel = self.percussion_channel
+        # Discard unmapped notes
+        elif self.args.discard_unmapped and mapped is None:
+            logging.info("Discarding note %s because it is not defined in DrumMap.", original)
+            new_msg = None
+        # Keep unmapped notes
         else:
-            logging.debug("Note %s not defined in DrumMap; keeping original.", original)
+            logging.debug(
+                "Keeping note %s as intact because it is not defined in DrumMap.", original
+            )
+
+        # Set percussion channel
+        if hasattr(new_msg, "channel") and self.args.force_percussion:
+            logging.info(
+                "Percussion channel %s is forced to note %s", self.percussion_channel + 1, original
+            )
+            new_msg.channel = self.percussion_channel
 
         return new_msg
 

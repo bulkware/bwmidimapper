@@ -43,21 +43,23 @@ def main(argv=None):
     # Define arguments
     parser.add_argument("infile", type=str, help="Input MIDI file with source drum mapping.")
     parser.add_argument("outfile", type=str, help="Output MIDI file with target drum mapping.")
-    parser.add_argument("--tempo", default=None, type=int,
-                        help="Tempo for output MIDI file, e.g. 120.")
-    parser.add_argument("--time-signature", default=None, type=appconfig.time_signature,
-                        help="Time signature for output MIDI file, eg. 4/4.")
     parser.add_argument("--drum-map", default=map_path, type=str,
                         help=f"Drum mapping file. Default is: '{map_file}'.")
+    parser.add_argument("--discard-unmapped", action="store_true",
+                        help="Discard notes that are not defined in the drum map.")
     parser.add_argument("--force-percussion", action="store_true",
                         help="Force mapped notes onto General MIDI percussion channel 10.")
+    parser.add_argument("--log-level", default="INFO",
+                        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+                        help="Logging verbosity level.")
     parser.add_argument("--preserve-meta", action="store_true",
                         help="Preserve tempo/time signature meta events from source file (may " +
                              "create duplicates meta events).")
     parser.add_argument("--remove-duplicates", action="store_true", help="Remove duplicate notes.")
-    parser.add_argument("--log-level", default="INFO",
-                        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-                        help="Logging verbosity level.")
+    parser.add_argument("--tempo", default=None, type=int,
+                        help="Tempo for output MIDI file, e.g. 120.")
+    parser.add_argument("--time-signature", default=None, type=appconfig.time_signature,
+                        help="Time signature for output MIDI file, eg. 4/4.")
 
     # Parse arguments
     args = parser.parse_args(argv)
